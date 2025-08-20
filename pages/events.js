@@ -2,7 +2,12 @@ import { supabase } from '../lib/supabase';
 
 export default function Events({ events }) {
   if (!events || events.length === 0) {
-    return <p>No events found.</p>;
+    return (
+      <div style={{ padding: '20px', fontFamily: 'Arial' }}>
+        <h1>Upcoming Events</h1>
+        <p>No events found.</p>
+      </div>
+    );
   }
 
   return (
@@ -14,7 +19,7 @@ export default function Events({ events }) {
             <h2>{event.title}</h2>
             <p>{event.description}</p>
             <p>
-              {event.city} | {event.date}
+              📍 {event.city} | 📅 {event.date}
             </p>
           </li>
         ))}
@@ -25,12 +30,14 @@ export default function Events({ events }) {
 
 export async function getServerSideProps() {
   const { data: events, error } = await supabase
-    .from('events') // lowercase table name
+    .from('events') // 👈 must match your table name in Supabase (lowercase)
     .select('*')
     .order('date', { ascending: true });
 
   if (error) {
-    console.log('Supabase error:', error);
+    console.error('Supabase error:', error.message);
+  } else {
+    console.log('Fetched events:', events);
   }
 
   return { props: { events: events || [] } };
